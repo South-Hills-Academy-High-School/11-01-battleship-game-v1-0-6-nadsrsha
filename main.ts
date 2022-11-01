@@ -4,13 +4,6 @@ namespace SpriteKind {
     export const Boat1 = SpriteKind.create()
     export const Boat2 = SpriteKind.create()
 }
-/**
- * TODO:
- * 
- * 1. Continue CPU player functions
- * 
- * 2. Fix bugs: Players can attack the same location twice, boat placement bugs
- */
 // moveBoat needs changes to take in the boatRotateArrayP1 or boatRotateArrayP2
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     rotateFlag = "nothing"
@@ -68,6 +61,12 @@ function makeBoatVisible (boatArray: Sprite[]) {
         currentBoatSprite.setFlag(SpriteFlag.Invisible, false)
     }
 }
+function cpuMove () {
+    game.splash("CPU Move")
+    grid.place(cursor, tiles.getTileLocation(randint(0, 9), randint(0, 6)))
+    isHitOrMiss(boatSpriteArrayP1, hitOrMissP2)
+    switchPlayer()
+}
 function isPlayerXWinner (enemyBoats: Sprite[][], hitOrMissPX: Sprite[]) {
     killCount = 0
     for (let index = 0; index <= 2; index++) {
@@ -94,11 +93,6 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (moveBoatFlag == 3) {
         if (currentPlayer == "Player1") {
             isHitOrMiss(boatSpriteArrayP2, hitOrMissP1)
-            switchPlayer()
-        } else if (singlePlayerFlag == 1) {
-            game.splash("CPU Move")
-            grid.place(cursor, tiles.getTileLocation(randint(0, 9), randint(0, 6)))
-            isHitOrMiss(boatSpriteArrayP1, hitOrMissP2)
             switchPlayer()
         } else {
             isHitOrMiss(boatSpriteArrayP1, hitOrMissP2)
@@ -133,6 +127,9 @@ function switchPlayer () {
         }
         makeBoatInvisible(hitOrMissP1)
         makeBoatVisible(hitOrMissP2)
+        if (singlePlayerFlag == 1 && moveBoatFlag == 3) {
+            cpuMove()
+        }
     } else {
         currentPlayer = "Player1"
         for (let boatIterator of boatSpriteArrayP2) {
@@ -187,6 +184,13 @@ function moveBoat (boatArray: any[], boatRotateArray: string[]) {
     }
 }
 function isHitOrMiss (enemyBoats: Sprite[][], hitOrMissPX: Sprite[]) {
+    if (currentPlayer == "Player 1") {
+        HitOrMissPlayer = "Player 1"
+    } else if (currentPlayer == "Player 2" && singlePlayerFlag == 1) {
+        HitOrMissPlayer = "CPU"
+    } else {
+        HitOrMissPlayer = "Player 2"
+    }
     for (let index = 0; index <= 2; index++) {
         for (let currentBoatSprite of enemyBoats[index]) {
             if (grid.spriteCol(currentBoatSprite) == grid.spriteCol(cursor) && grid.spriteRow(currentBoatSprite) == grid.spriteRow(cursor)) {
@@ -663,12 +667,20 @@ function isOverlapping (boatSpriteArrayPX: Sprite[][]) {
     }
     return 0
 }
+/**
+ * TODO:
+ * 
+ * 1. Continue CPU player functions
+ * 
+ * 2. Fix bugs: Players can attack the same location twice, boat placement bugs
+ */
 let boomSprite: Sprite = null
+let HitOrMissPlayer = ""
 let iterator = 0
-let hitOrMissP2: Sprite[] = []
 let hitOrMissP1: Sprite[] = []
 let currentBoatBoomCounter = 0
 let killCount = 0
+let hitOrMissP2: Sprite[] = []
 let boatRotateArrayP2: string[] = []
 let boatSpriteArrayP2: Sprite[][] = []
 let boatRotateArrayP1: string[] = []
@@ -681,7 +693,11 @@ let rotateFlag = ""
 let currentPlayer = ""
 let singlePlayerFlag = 0
 tiles.setCurrentTilemap(tilemap`level1`)
-singlePlayerFlag = 1
+if (game.ask("single player?", "multiplayer?")) {
+    singlePlayerFlag = 1
+} else {
+    singlePlayerFlag = 0
+}
 currentPlayer = "Player1"
 initP1()
 initP2()
