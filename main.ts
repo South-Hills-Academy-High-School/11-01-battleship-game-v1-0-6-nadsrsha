@@ -214,7 +214,7 @@ function isHitOrMiss (enemyBoats: Sprite[][], hitOrMissPX: Sprite[]) {
                     `, SpriteKind.Projectile)
                 grid.place(boomSprite, grid.getLocation(cursor))
                 hitOrMissPX.push(boomSprite)
-                game.splash("" + currentPlayer + " HIT!! " + convertToText(isPlayerXWinner(enemyBoats, hitOrMissPX)) + " boats destroyed!")
+                game.splash("" + HitOrMissPlayer + " HIT!! " + convertToText(isPlayerXWinner(enemyBoats, hitOrMissPX)) + " boats destroyed!")
                 return 1
             }
         }
@@ -239,7 +239,7 @@ function isHitOrMiss (enemyBoats: Sprite[][], hitOrMissPX: Sprite[]) {
         `, SpriteKind.Projectile)
     grid.place(boomSprite, grid.getLocation(cursor))
     hitOrMissPX.push(boomSprite)
-    game.splash("" + currentPlayer + " MISS!!")
+    game.splash("" + HitOrMissPlayer + " MISS!!")
     return 0
 }
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
